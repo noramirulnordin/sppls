@@ -8,15 +8,13 @@
             </div>
         @endif
         <div class="row">
+
+
             <div class="col-xl-12">
                 <div class="row">
                     <div class="col-12 mb-4 d-flex align-items-center justify-content-between">
                         <h4 class="header-title mb-0">Maklumat Data</h4>
-                        {{-- <form id="dashboard-date-form" class="d-flex align-items-center">
-                            <label for="dashboard-date" class="me-2 mb-0">Tarikh:</label>
-                            <input type="date" id="dashboard-date" name="dashboard_date" class="form-control"
-                                value="{{ request('dashboard_date', now()->format('Y-m-d')) }}">
-                        </form> --}}
+
                     </div>
 
                     @foreach ($card as $cardData)
@@ -133,13 +131,6 @@
 @section('scripts')
     <script src="/assets/js/vendor/apexcharts.min.js"></script>
     <script>
-        // Update the date input value when the form is submitted
-        document.getElementById('dashboard-date').addEventListener('change', function() {
-            const selectedDate = this.value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('dashboard_date', selectedDate);
-            window.location.href = url.toString();
-        });
         $(document).ready(function() {
             var options = {
                 chart: {
@@ -157,28 +148,13 @@
                 },
                 series: [{
                     name: "Jumlah Balak Terjual",
-                    data: [
-                        @php
-                            use App\Models\Transaksi;
-                            $data = [];
-                            for ($i = 6; $i >= 0; $i--) {
-                                $date = \Carbon\Carbon::now()->subDays($i)->format('Y-m-d');
-                                $count = Transaksi::whereDate('tarikh_dibeli', $date)->count();
-                                $data[] = $count;
-                            }
-                            echo implode(',', $data);
-                        @endphp
-                    ]
+                    data: [{{ implode(',', $chart1['data']) }}]
                 }],
                 xaxis: {
                     categories: [
-                        @php
-                            $dates = [];
-                            for ($i = 6; $i >= 0; $i--) {
-                                $dates[] = \Carbon\Carbon::now()->subDays($i)->format('d M Y');
-                            }
-                            echo "'" . implode("','", $dates) . "'";
-                        @endphp
+                        @foreach ($chart1['date'] as $label)
+                            "{{ $label }}",
+                        @endforeach
                     ],
                 },
                 tooltip: {
@@ -192,13 +168,6 @@
 
             var chart = new ApexCharts(document.querySelector("#line-chart"), options);
             chart.render();
-
-            @php
-                use App\Models\Balak;
-                $total = Balak::count();
-                $rosak = Balak::where('status', 'Dijual')->count();
-                $percent = $total > 0 ? round(($rosak / $total) * 100, 2) : 0;
-            @endphp
 
             var dataColors = $("#gradient-chart").data("colors");
             var colors = dataColors ? dataColors.split(",") : [];
@@ -275,7 +244,20 @@
                         stops: [0, 100],
                     },
                 },
-                series: [{{ $percent }}],
+                fill: {
+                    type: "gradient",
+                    gradient: {
+                        shade: "dark",
+                        type: "horizontal",
+                        shadeIntensity: 0.5,
+                        gradientToColors: colors,
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100],
+                    },
+                },
+                series: [{{ $chart2 }}],
                 stroke: {
                     lineCap: "round"
                 },

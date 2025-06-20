@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Transaksi;
 use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
@@ -54,7 +55,27 @@ class HomeController extends Controller
                 'icon'  => 'mdi mdi-account-group',
             ],
         ];
-        return view('home', compact('card'));
+
+        //chart1
+        $chart1 = [];
+        $chart1 = [
+            'data' => [],
+            'date' => [],
+        ];
+        for ($i = 6; $i >= 0; $i--) {
+            $dateYmd          = \Carbon\Carbon::now()->subDays($i)->format('Y-m-d');
+            $dateDMY          = \Carbon\Carbon::now()->subDays($i)->format('d M Y');
+            $count            = Transaksi::whereDate('tarikh_dibeli', $dateYmd)->count();
+            $chart1['data'][] = $count;
+            $chart1['date'][] = $dateDMY;
+        }
+
+        //chart2
+        $totalBalak  = \App\Models\Balak::count();
+        $balakDijual = \App\Models\Balak::where('status', 'Dijual')->count();
+        $chart2      = $totalBalak > 0 ? round(($balakDijual / $totalBalak) * 100, 2) : 0;
+
+        return view('home', compact('card', 'chart1', 'chart2'));
     }
 
     public function profile()
