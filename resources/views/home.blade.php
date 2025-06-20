@@ -14,11 +14,11 @@
                 <div class="row">
                     <div class="col-12 mb-4 d-flex align-items-center justify-content-between">
                         <h4 class="header-title mb-0">Maklumat Data</h4>
-                        <form id="dashboard-date-form" class="d-flex align-items-center">
+                        {{-- <form id="dashboard-date-form" class="d-flex align-items-center">
                             <label for="dashboard-date" class="me-2 mb-0">Tarikh:</label>
                             <input type="date" id="dashboard-date" name="dashboard_date" class="form-control"
                                 value="{{ request('dashboard_date', now()->format('Y-m-d')) }}">
-                        </form>
+                        </form> --}}
                     </div>
 
                     @foreach ($card as $cardData)
